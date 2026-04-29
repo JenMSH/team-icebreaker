@@ -1,0 +1,385 @@
+/* ===== Stage ===== */
+.ib-stage {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  aspect-ratio: 760 / 540;
+  margin: 0 auto;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(80,40,120,0.6), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(40,80,160,0.5), transparent 60%),
+    linear-gradient(180deg, #06081a 0%, #0a0420 60%, #0e0830 100%);
+  border: 3px solid #80a0c0;
+  box-shadow:
+    4px 4px 0 #2c1840,
+    inset 0 0 0 2px #1a1040,
+    0 0 30px rgba(120, 80, 200, 0.3);
+  color: #fff;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.ib-stage-inner {
+  position: absolute;
+  inset: 0;
+  /* The stage uses a fixed 760×540 logical viewport that scales with aspect-ratio.
+     Children use absolute coords assuming 760×540, so we transform to fit. */
+}
+
+.ib-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, #ffffff 50%, transparent),
+    radial-gradient(1px 1px at 28% 62%, #c8d8ff 50%, transparent),
+    radial-gradient(1px 1px at 44% 32%, #fff8c0 50%, transparent),
+    radial-gradient(2px 2px at 60% 12%, #ffffff 50%, transparent),
+    radial-gradient(1px 1px at 75% 78%, #d0e8ff 50%, transparent),
+    radial-gradient(1px 1px at 89% 44%, #ffe0a0 50%, transparent),
+    radial-gradient(1px 1px at 8% 80%, #ffffff 50%, transparent),
+    radial-gradient(1px 1px at 50% 88%, #c8d8ff 50%, transparent),
+    radial-gradient(2px 2px at 96% 8%, #ffffff 50%, transparent),
+    radial-gradient(1px 1px at 35% 92%, #fff 50%, transparent);
+  background-size: 100% 600px;
+  animation: ib-star-drift 18s linear infinite;
+  opacity: 0.85;
+  pointer-events: none;
+}
+@keyframes ib-star-drift {
+  from { background-position: 0 0; }
+  to   { background-position: 0 600px; }
+}
+
+.ib-actor {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.ib-bullet {
+  width: 4px;
+  height: 14px;
+  background: linear-gradient(to bottom, #ffffff, #ffe040);
+  box-shadow: 0 0 6px #ffe040, 0 0 12px #ffc040;
+}
+
+.ib-spark {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+/* ===== Explosion ===== */
+@keyframes ib-explode {
+  0%   { transform: translate(-50%, -50%) scale(0.3); opacity: 1; filter: brightness(2); }
+  60%  { transform: translate(-50%, -50%) scale(1.1); opacity: 0.95; }
+  100% { transform: translate(-50%, -50%) scale(1.7); opacity: 0; }
+}
+.ib-explosion {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #ffe040 28%, #ff8030 50%, #c83020 72%, transparent 85%);
+  animation: ib-explode 0.5s ease-out forwards;
+}
+
+/* ===== Ship rise on start ===== */
+@keyframes ib-ship-rise {
+  from { transform: translate(-50%, -50%) translateY(60px); opacity: 0; }
+  to   { transform: translate(-50%, -50%) translateY(0); opacity: 1; }
+}
+.ib-ship-rise { animation: ib-ship-rise 0.4s ease-out; }
+
+/* ===== Shake ===== */
+@keyframes ib-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-5px, 2px); }
+  40% { transform: translate(4px, -3px); }
+  60% { transform: translate(-3px, 4px); }
+  80% { transform: translate(5px, 1px); }
+}
+.ib-shake { animation: ib-shake 0.4s steps(8); }
+
+/* ===== HUD ===== */
+.ib-hud {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 18px;
+  font-family: "VT323", monospace;
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  color: #ffe040;
+  text-shadow: 0 0 6px #ffe040;
+  z-index: 10;
+  pointer-events: none;
+}
+.ib-hud span { font-variant-numeric: tabular-nums; }
+
+.ib-progress-track {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #80c0ff;
+  z-index: 10;
+}
+.ib-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #80c0ff, #80e0c0, #ffe040);
+  transition: width 0.15s linear;
+}
+
+/* ===== Title screen ===== */
+.ib-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 20;
+  pointer-events: none;
+  text-align: center;
+  padding: 20px;
+}
+
+.ib-big-title {
+  font-family: "VT323", monospace;
+  font-size: clamp(48px, 9vw, 84px);
+  letter-spacing: 0.06em;
+  color: #ffe040;
+  text-shadow: 0 0 12px #ff5080, 0 0 24px #ffe040;
+}
+
+@keyframes ib-press-blink {
+  0%, 60% { opacity: 1; }
+  70%, 100% { opacity: 0; }
+}
+.ib-press {
+  animation: ib-press-blink 1.2s steps(2) infinite;
+  color: #ff8060;
+  letter-spacing: 0.15em;
+}
+
+.ib-controls-hint {
+  font-family: "VT323", monospace;
+  font-size: 18px;
+  letter-spacing: 0.18em;
+  color: #c8d8ff;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+.ib-controls-hint kbd {
+  display: inline-block;
+  padding: 1px 8px;
+  margin: 0 2px;
+  background: #1a1040;
+  border: 2px solid #80c0ff;
+  box-shadow: 2px 2px 0 #2c1840;
+  font-family: inherit;
+  font-size: 16px;
+  color: #fff;
+}
+
+/* ===== Win / Lose overlays ===== */
+.ib-end-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
+  padding: 20px;
+}
+.ib-end-overlay.win {
+  background: radial-gradient(ellipse at center, rgba(80, 200, 100, 0.25), transparent 65%);
+}
+.ib-end-overlay.lose {
+  background: radial-gradient(ellipse at center, rgba(200, 60, 60, 0.30), transparent 65%);
+}
+
+@keyframes ib-banner-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.ib-banner-big {
+  font-family: "VT323", monospace;
+  font-size: clamp(48px, 9vw, 84px);
+  letter-spacing: 0.12em;
+  animation: ib-banner-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+.ib-banner-big.win {
+  color: #80f0a0;
+  text-shadow:
+    0 0 8px #80f0a0,
+    0 0 22px #40c060,
+    4px 4px 0 #103820;
+}
+.ib-banner-big.lose {
+  color: #ff5050;
+  text-shadow:
+    0 0 8px #ff5050,
+    0 0 22px #c02020,
+    4px 4px 0 #401010;
+}
+
+.ib-end-stat {
+  font-family: "VT323", monospace;
+  font-size: 22px;
+  letter-spacing: 0.2em;
+  color: #ffe040;
+  text-shadow: 0 0 6px #ffe040;
+}
+
+/* Confetti sparks for win */
+@keyframes ib-confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(580px) rotate(720deg); opacity: 0; }
+}
+.ib-confetti {
+  position: absolute;
+  width: 8px;
+  height: 12px;
+  top: 0;
+  pointer-events: none;
+  animation: ib-confetti-fall 1.6s linear forwards;
+}
+
+/* Smoke streaks for lose */
+@keyframes ib-smoke-rise {
+  0%   { transform: translateY(0) scale(0.5); opacity: 0.6; }
+  100% { transform: translateY(-160px) scale(1.4); opacity: 0; }
+}
+.ib-smoke {
+  position: absolute;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(180,40,40,0.4), transparent 70%);
+  pointer-events: none;
+  animation: ib-smoke-rise 1.6s ease-out forwards;
+}
+
+/* ===== Question card ===== */
+@keyframes ib-card-pop {
+  0%   { transform: scale(0.2) rotate(-6deg); opacity: 0; }
+  60%  { transform: scale(1.05) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.ib-question {
+  width: min(86%, 600px);
+  padding: 24px 28px;
+  background: linear-gradient(180deg, #fff8e0, #f8e8b8);
+  border: 4px solid #2c1840;
+  box-shadow:
+    6px 6px 0 #2c1840,
+    inset 0 0 0 2px #ffe080,
+    0 0 28px rgba(255, 224, 64, 0.55);
+  color: #2c1840;
+  text-align: center;
+  font-family: "VT323", monospace;
+  animation: ib-card-pop 0.55s cubic-bezier(0.2, 1.2, 0.4, 1) 0.5s forwards;
+  opacity: 0;
+}
+.ib-question-eyebrow {
+  font-size: 16px;
+  letter-spacing: 0.22em;
+  color: #6a3010;
+  margin-bottom: 10px;
+}
+.ib-question-text {
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+
+/* ===== Buttons ===== */
+.ib-btn {
+  background: #f0d090;
+  border: 3px solid #2c1840;
+  box-shadow: 4px 4px 0 #2c1840;
+  color: #2c1840;
+  font-family: "VT323", monospace;
+  font-size: 24px;
+  letter-spacing: 0.08em;
+  padding: 10px 28px;
+  cursor: pointer;
+  transition: transform 0.06s, box-shadow 0.06s, background 0.1s;
+}
+.ib-btn:hover { background: #ffe080; }
+.ib-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #2c1840; }
+.ib-btn:focus-visible { outline: 2px solid #ffe040; outline-offset: 2px; }
+
+/* ===== Touch controls (visible on touch / small screens) ===== */
+.ib-touch-row {
+  display: none;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+.ib-touch-btn {
+  background: #1a1040;
+  border: 3px solid #80c0ff;
+  box-shadow: 3px 3px 0 #2c1840;
+  color: #ffe040;
+  font-family: "VT323", monospace;
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  padding: 14px 22px;
+  min-width: 72px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.ib-touch-btn.fire { min-width: 120px; }
+.ib-touch-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #2c1840;
+  background: #2c1860;
+}
+@media (hover: none) and (pointer: coarse) {
+  .ib-touch-row { display: flex; }
+}
+
+/* ===== Title outside stage ===== */
+.ib-page-title {
+  font-family: "VT323", monospace;
+  font-size: clamp(28px, 4.5vw, 42px);
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin: 0 0 4px 0;
+  color: #ff8060;
+  text-shadow: 2px 2px 0 #2c1840;
+}
+.ib-page-tagline {
+  text-align: center;
+  font-size: 16px;
+  letter-spacing: 0.18em;
+  color: #c8d8ff;
+  opacity: 0.8;
+  margin-bottom: 14px;
+}
+
+.ib-meta {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: #8898b8;
+}
