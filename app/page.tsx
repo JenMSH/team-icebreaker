@@ -495,7 +495,20 @@ export default function IcebreakerPage() {
       </div>
 
       <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 18 }}>
-        <button onClick={start} className="ib-btn">
+        <button
+          onClick={(e) => {
+            e.currentTarget.blur();
+            start();
+          }}
+          onKeyDown={(e) => {
+            // Don't let SPACE/ENTER on the button trigger a restart while playing
+            // or accidentally on key-release after a game ends.
+            if (e.key === " " || e.key === "Enter" || e.key === "Spacebar") {
+              e.preventDefault();
+            }
+          }}
+          className="ib-btn"
+        >
           {phase === "title" ? "▸ INSERT COIN" : isEnd ? "▸ NEXT TURN" : "▸ RESTART"}
         </button>
       </div>
