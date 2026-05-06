@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#06081a" />
+<title>Team Icebreaker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; image-rendering: pixelated; }
+html, body { margin: 0; padding: 0; }
+body {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(80,40,120,.5), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(40,80,160,.5), transparent 60%),
+    linear-gradient(180deg, #06081a 0%, #0a0420 60%, #0e0830 100%);
+  background-attachment: fixed;
+  color: #fff;
+  font-family: "VT323", monospace;
+  font-size: 18px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+button { font-family: inherit; }
+::selection { background: #ffe040; color: #2c1840; }
+
+.page { padding: 28px 16px 40px; max-width: 880px; margin: 0 auto; }
+.page-title {
+  font-family: "VT323", monospace;
+  font-size: clamp(28px, 4.5vw, 42px);
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin: 0 0 4px 0;
+  color: #ff8060;
+  text-shadow: 2px 2px 0 #2c1840;
+  animation: title-glow 2s ease-in-out infinite;
+}
+@keyframes title-glow {
+  0%, 100% { color: #ff8060; }
+  50% { color: #ffb060; }
+}
+.page-tagline {
+  text-align: center;
+  font-size: 16px;
+  letter-spacing: 0.18em;
+  color: #c8d8ff;
+  opacity: 0.8;
+  margin-bottom: 14px;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  aspect-ratio: 760 / 540;
+  margin: 0 auto;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(80,40,120,.6), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(40,80,160,.5), transparent 60%),
+    linear-gradient(180deg, #06081a 0%, #0a0420 60%, #0e0830 100%);
+  border: 3px solid #80a0c0;
+  box-shadow: 4px 4px 0 #2c1840, inset 0 0 0 2px #1a1040, 0 0 30px rgba(120,80,200,.3);
+  user-select: none;
+  touch-action: manipulation;
+}
+.stage::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, #fff 50%, transparent),
+    radial-gradient(1px 1px at 28% 62%, #c8d8ff 50%, transparent),
+    radial-gradient(1px 1px at 44% 32%, #fff8c0 50%, transparent),
+    radial-gradient(2px 2px at 60% 12%, #fff 50%, transparent),
+    radial-gradient(1px 1px at 75% 78%, #d0e8ff 50%, transparent),
+    radial-gradient(1px 1px at 89% 44%, #ffe0a0 50%, transparent),
+    radial-gradient(1px 1px at 8% 80%, #fff 50%, transparent),
+    radial-gradient(1px 1px at 50% 88%, #c8d8ff 50%, transparent),
+    radial-gradient(2px 2px at 96% 8%, #fff 50%, transparent),
+    radial-gradient(1px 1px at 35% 92%, #fff 50%, transparent);
+  background-size: 100% 600px;
+  animation: star-drift 18s linear infinite;
+  opacity: 0.85;
+  pointer-events: none;
+}
+@keyframes star-drift { from { background-position: 0 0; } to { background-position: 0 600px; } }
+
+#game {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hud {
+  position: absolute; top: 10px; left: 0; right: 0;
+  display: flex; justify-content: space-between;
+  padding: 0 18px;
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  color: #ffe040;
+  text-shadow: 0 0 6px #ffe040;
+  z-index: 10;
+  pointer-events: none;
+}
+.hud span { font-variant-numeric: tabular-nums; }
+.progress {
+  position: absolute; bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 60%; height: 8px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid #80c0ff;
+  z-index: 10;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #80c0ff, #80e0c0, #ffe040);
+  transition: width 0.15s linear;
+}
+
+.overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; z-index: 20; padding: 20px; text-align: center;
+  pointer-events: none;
+}
+.big-title {
+  font-size: clamp(48px, 9vw, 84px);
+  letter-spacing: 0.06em;
+  color: #ffe040;
+  text-shadow: 0 0 12px #ff5080, 0 0 24px #ffe040;
+}
+.press {
+  animation: press-blink 1.2s steps(2) infinite;
+  color: #ff8060;
+  letter-spacing: 0.15em;
+  font-size: 22px;
+}
+@keyframes press-blink {
+  0%, 60% { opacity: 1; }
+  70%, 100% { opacity: 0; }
+}
+.ctrl-hint { font-size: 18px; letter-spacing: 0.18em; color: #c8d8ff; opacity: 0.85; }
+.ctrl-hint kbd {
+  display: inline-block;
+  padding: 1px 8px; margin: 0 2px;
+  background: #1a1040; border: 2px solid #80c0ff;
+  box-shadow: 2px 2px 0 #2c1840;
+  font-family: inherit; font-size: 16px; color: #fff;
+}
+
+.end-overlay {
+  position: absolute; inset: 0; z-index: 25;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 18px; padding: 20px; text-align: center;
+}
+.end-overlay.win {
+  background: radial-gradient(ellipse at center, rgba(80,200,100,.25), transparent 65%);
+}
+.end-overlay.lose {
+  background: radial-gradient(ellipse at center, rgba(200,60,60,.30), transparent 65%);
+}
+.end-overlay[hidden] { display: none; }
+
+.banner-big {
+  font-size: clamp(48px, 9vw, 84px);
+  letter-spacing: 0.12em;
+  animation: banner-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+.banner-big.win {
+  color: #80f0a0;
+  text-shadow: 0 0 8px #80f0a0, 0 0 22px #40c060, 4px 4px 0 #103820;
+}
+.banner-big.lose {
+  color: #ff5050;
+  text-shadow: 0 0 8px #ff5050, 0 0 22px #c02020, 4px 4px 0 #401010;
+}
+@keyframes banner-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.end-stat {
+  font-size: 22px; letter-spacing: 0.2em;
+  color: #ffe040; text-shadow: 0 0 6px #ffe040;
+}
+
+.confetti {
+  position: absolute; top: 0;
+  width: 8px; height: 12px;
+  pointer-events: none;
+  animation: confetti-fall 1.6s linear forwards;
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(580px) rotate(720deg); opacity: 0; }
+}
+
+.smoke {
+  position: absolute; bottom: 0;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(180,40,40,.4), transparent 70%);
+  pointer-events: none;
+  animation: smoke-rise 1.6s ease-out forwards;
+}
+@keyframes smoke-rise {
+  0%   { transform: translateY(0) scale(0.5); opacity: 0.6; }
+  100% { transform: translateY(-160px) scale(1.4); opacity: 0; }
+}
+
+.question-card {
+  width: min(86%, 600px);
+  padding: 24px 28px;
+  background: linear-gradient(180deg, #fff8e0, #f8e8b8);
+  border: 4px solid #2c1840;
+  box-shadow: 6px 6px 0 #2c1840, inset 0 0 0 2px #ffe080, 0 0 28px rgba(255,224,64,.55);
+  color: #2c1840; text-align: center;
+  animation: card-pop 0.55s cubic-bezier(0.2, 1.2, 0.4, 1) 0.5s forwards;
+  opacity: 0;
+}
+@keyframes card-pop {
+  0% { transform: scale(0.2) rotate(-6deg); opacity: 0; }
+  60% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.question-eyebrow {
+  font-size: 16px; letter-spacing: 0.22em;
+  color: #6a3010; margin-bottom: 10px;
+}
+.question-text {
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.25; letter-spacing: 0.02em;
+}
+
+.controls { display: flex; justify-content: center; gap: 12px; margin-top: 18px; }
+.btn {
+  background: #f0d090;
+  border: 3px solid #2c1840;
+  box-shadow: 4px 4px 0 #2c1840;
+  color: #2c1840;
+  font-size: 24px;
+  letter-spacing: 0.08em;
+  padding: 10px 28px;
+  cursor: pointer;
+  transition: transform .06s, box-shadow .06s, background .1s;
+}
+.btn:hover { background: #ffe080; }
+.btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #2c1840; }
+.btn:focus-visible { outline: 2px solid #ffe040; outline-offset: 2px; }
+
+.touch-row { display: none; justify-content: center; gap: 12px; margin-top: 14px; }
+.touch-btn {
+  background: #1a1040; border: 3px solid #80c0ff;
+  box-shadow: 3px 3px 0 #2c1840; color: #ffe040;
+  font-size: 28px; letter-spacing: 0.04em;
+  padding: 14px 22px; min-width: 72px;
+  cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.touch-btn.fire { min-width: 120px; }
+.touch-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #2c1840;
+  background: #2c1860;
+}
+@media (hover: none) and (pointer: coarse) {
+  .touch-row { display: flex; }
+}
+
+.meta {
+  text-align: center; margin-top: 16px;
+  font-size: 14px; letter-spacing: 0.12em;
+  color: #8898b8;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-5px, 2px); }
+  40% { transform: translate(4px, -3px); }
+  60% { transform: translate(-3px, 4px); }
+  80% { transform: translate(5px, 1px); }
+}
+.shake { animation: shake 0.4s steps(8); }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1 class="page-title">★ TEAM ICEBREAKER ★</h1>
+    <div class="page-tagline">SHOOT THE INVADERS · UNLOCK THE QUESTION</div>
+
+    <div id="stage" class="stage">
+      <canvas id="game" width="760" height="540"></canvas>
+      <div id="hud" class="hud" hidden>
+        <span id="hud-kills">KILLS 00 / 8</span>
+        <span id="hud-time">TIME 30.0s</span>
+      </div>
+      <div id="progress" class="progress" hidden>
+        <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+      </div>
+      <div id="title-overlay" class="overlay">
+        <div class="big-title">GALAGA</div>
+        <div class="press">▸ PRESS LAUNCH TO PLAY ◂</div>
+        <div class="ctrl-hint"><kbd>←</kbd><kbd>→</kbd> MOVE &nbsp;·&nbsp; <kbd>SPACE</kbd> FIRE</div>
+        <div class="ctrl-hint" style="font-size:16px;">8 KILLS IN 30s = WIN</div>
+      </div>
+      <div id="end-overlay" class="end-overlay" hidden>
+        <div id="end-banner" class="banner-big"></div>
+        <div id="end-stat" class="end-stat"></div>
+        <div class="question-card">
+          <div class="question-eyebrow">★ TODAY&rsquo;S QUESTION ★</div>
+          <div id="question-text" class="question-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="launch" class="btn">▸ INSERT COIN</button>
+    </div>
+
+    <div class="touch-row">
+      <button class="touch-btn" data-key="arrowleft" aria-label="Left">◀</button>
+      <button class="touch-btn fire" data-key="fire" aria-label="Fire">FIRE</button>
+      <button class="touch-btn" data-key="arrowright" aria-label="Right">▶</button>
+    </div>
+
+    <div class="meta">60 QUESTIONS · 30 SECONDS · 8 KILLS TO WIN</div>
+  </div>
+
+<script>
+"use strict";
+
+// ===== Questions =====
+const QUESTIONS = [
+  "If you could instantly master one completely useless skill, what would it be?",
+  "What's the most unhinged thing currently in your fridge?",
+  "If your life had a theme song that played when you walked into rooms, what would it be?",
+  "What's a small, petty hill you'd die on?",
+  "If you had to eat one meal for the rest of your life, what would it be?",
+  "What's the weirdest thing you believed as a kid?",
+  "What's your go-to karaoke song (even if you'd never actually sing it)?",
+  "If you were a kitchen utensil, which one and why?",
+  "What's the last thing you Googled?",
+  "What's a movie or show you'll defend even though it's objectively bad?",
+  "What's something you've done that you're surprisingly proud of?",
+  "What did your younger self think you'd be doing right now?",
+  "What's a hobby you've always wanted to pick up but haven't?",
+  "What's the best piece of advice you've ever received?",
+  "Where's a place you've travelled that exceeded expectations?",
+  "What's something you're learning or trying to get better at right now?",
+  "What's a book, podcast, or show that's stuck with you?",
+  "What's your favourite way to spend a Sunday?",
+  "What's something you've changed your mind about in the last few years?",
+  "Who in your life shaped how you work the most?",
+  "What's something you do at work that energises you, even on bad days?",
+  "What's a small workplace ritual or habit you swear by?",
+  "If you could swap jobs with anyone for a week, who and why?",
+  "What's a skill you'd like to borrow from someone else on the team?",
+  "You get to add one new public holiday — what's it for?",
+  "If you could time travel for 24 hours, when and where?",
+  "You can have dinner with three people, dead or alive — who?",
+  "If you had to teach a class on something tomorrow, what would it be?",
+  "What superpower would you choose, and what's the catch you'd accept?",
+  "You win the lottery on Monday — what's your Tuesday look like?",
+  "If you could instantly be fluent in any language, which one?",
+  "What's a small invention that would make your life noticeably better?",
+  "If you opened a café/shop/business tomorrow, what would it be?",
+  "You can erase one song from existence forever — which one?",
+  "What's something you used to find hard that now feels easy?",
+  "What's a moment recently where you felt genuinely proud of yourself?",
+  "What does a “good day” look like for you?",
+  "What's something you've been thinking about a lot lately?",
+  "What's a tradition (family, cultural, made-up) that matters to you?",
+  "What's a compliment you've gotten that really stuck?",
+  "What's something you wish more people knew about you?",
+  "What's the kindest thing someone's done for you at work?",
+  "What are you most looking forward to in the next few months?",
+  "If this year had a one-word theme so far, what would yours be?",
+  "What's a belief or value you hold now that you didn't five years ago?",
+  "When do you feel most like yourself?",
+  "What's something you're slowly making peace with?",
+  "What's a question you've been sitting with lately?",
+  "Who's someone you think about often who doesn't know it?",
+  "What's a version of yourself you've outgrown?",
+  "What's something that used to scare you that you've made friends with?",
+  "What's a quiet win from this year that no one really noticed?",
+  "What's something you'd tell yourself five years ago, knowing they probably wouldn't listen?",
+  "What's a relationship in your life you'd like to invest more in?",
+  "What's something you want to be true of you in ten years?",
+  "What's a season of life you didn't realise was special until it ended?",
+  "What's something you're holding loosely right now?",
+  "What does success look like for you outside of work?",
+  "What's a fear you've noticed shaping your decisions?",
+  "What's something small that consistently brings you back to yourself?"
+];
+
+// ===== Constants =====
+const STAGE_W = 760, STAGE_H = 540;
+const SHIP_Y = 480;
+const SHIP_HALF_W = 18;
+const SHIP_SPEED = 380;
+const BULLET_SPEED = 720;
+const FIRE_COOLDOWN = 220;
+const MAX_BULLETS = 6;
+const ROUND_MS = 30000;
+const KILL_GOAL = 8;
+const HIT_RX = 22, HIT_RY = 18;
+const INVADER_HALF = 16;
+const HUES = ["#ff6080", "#80c0ff", "#ffc040", "#a080ff", "#80e0c0", "#ff80c0"];
+
+// ===== DOM =====
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
+
+const stageEl = document.getElementById("stage");
+const hudEl = document.getElementById("hud");
+const hudKillsEl = document.getElementById("hud-kills");
+const hudTimeEl = document.getElementById("hud-time");
+const progEl = document.getElementById("progress");
+const progFillEl = document.getElementById("progress-fill");
+const titleOverlayEl = document.getElementById("title-overlay");
+const endOverlayEl = document.getElementById("end-overlay");
+const endBannerEl = document.getElementById("end-banner");
+const endStatEl = document.getElementById("end-stat");
+const questionTextEl = document.getElementById("question-text");
+const launchBtn = document.getElementById("launch");
+
+// ===== Sprites (pixel rect lists) =====
+const SHIP_PIXELS = [
+  [6, 0, 2, 2, "#fff"],
+  [5, 2, 4, 2, "#ffe040"],
+  [4, 4, 6, 2, "#ffe040"],
+  [3, 6, 8, 2, "#ffc830"],
+  [0, 8, 14, 2, "#ffc830"],
+  [0, 10, 14, 2, "#ff5040"],
+  [2, 12, 2, 2, "#ff8830"],
+  [6, 12, 2, 2, "#ff8830"],
+  [10, 12, 2, 2, "#ff8830"],
+];
+const INVADER_PIXELS = [
+  [2, 0, 2, 2, "h"], [8, 0, 2, 2, "h"],
+  [2, 2, 8, 2, "h"],
+  [0, 4, 12, 2, "h"],
+  [2, 4, 2, 2, "e"], [8, 4, 2, 2, "e"],
+  [0, 6, 2, 2, "h"], [4, 6, 4, 2, "h"], [10, 6, 2, 2, "h"],
+  [2, 8, 2, 2, "h"], [8, 8, 2, 2, "h"],
+  [0, 10, 2, 2, "h"], [10, 10, 2, 2, "h"],
+];
+const SHIP_SCALE = 3, SHIP_W = 14, SHIP_H = 14;
+const INV_SCALE = 3, INV_W = 12, INV_H = 12;
+
+function drawShip(cx, cy) {
+  const ox = Math.round(cx - SHIP_W * SHIP_SCALE / 2);
+  const oy = Math.round(cy - SHIP_H * SHIP_SCALE / 2);
+  for (let i = 0; i < SHIP_PIXELS.length; i++) {
+    const p = SHIP_PIXELS[i];
+    ctx.fillStyle = p[4];
+    ctx.fillRect(ox + p[0] * SHIP_SCALE, oy + p[1] * SHIP_SCALE, p[2] * SHIP_SCALE, p[3] * SHIP_SCALE);
+  }
+}
+function drawInvader(cx, cy, hue) {
+  const ox = Math.round(cx - INV_W * INV_SCALE / 2);
+  const oy = Math.round(cy - INV_H * INV_SCALE / 2);
+  for (let i = 0; i < INVADER_PIXELS.length; i++) {
+    const p = INVADER_PIXELS[i];
+    ctx.fillStyle = p[4] === "e" ? "#fff" : hue;
+    ctx.fillRect(ox + p[0] * INV_SCALE, oy + p[1] * INV_SCALE, p[2] * INV_SCALE, p[3] * INV_SCALE);
+  }
+}
+function drawBullet(cx, cy) {
+  ctx.shadowColor = "#ffe040";
+  ctx.shadowBlur = 8;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(cx - 2, cy - 7, 4, 14);
+  ctx.fillStyle = "#ffe040";
+  ctx.fillRect(cx - 1, cy - 7, 2, 14);
+  ctx.shadowBlur = 0;
+}
+function drawExplosion(cx, cy, t) {
+  const r = 10 + t * 50;
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+  const a = 1 - t;
+  grad.addColorStop(0, "rgba(255,255,255," + a + ")");
+  grad.addColorStop(0.28, "rgba(255,224,64," + a + ")");
+  grad.addColorStop(0.50, "rgba(255,128,48," + (a * 0.8) + ")");
+  grad.addColorStop(0.72, "rgba(200,48,32," + (a * 0.6) + ")");
+  grad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+function drawSpark(cx, cy, hue, t) {
+  const r = 3 * (1 - t * 0.7);
+  ctx.globalAlpha = 1 - t;
+  ctx.shadowColor = hue;
+  ctx.shadowBlur = 6;
+  ctx.fillStyle = hue;
+  ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1;
+}
+
+// ===== State =====
+let phase = "title"; // "title" | "playing" | "won" | "lost"
+let game = null;
+let rafId = null;
+const askedSet = new Set();
+
+function pickQuestion() {
+  let pool = [];
+  for (let i = 0; i < QUESTIONS.length; i++) if (!askedSet.has(i)) pool.push(i);
+  if (pool.length === 0) {
+    askedSet.clear();
+    for (let i = 0; i < QUESTIONS.length; i++) pool.push(i);
+  }
+  const idx = pool[Math.floor(Math.random() * pool.length)];
+  askedSet.add(idx);
+  return QUESTIONS[idx];
+}
+
+function setPhase(p) {
+  phase = p;
+  titleOverlayEl.hidden = p !== "title";
+  hudEl.hidden = p !== "playing";
+  progEl.hidden = p !== "playing";
+  endOverlayEl.hidden = !(p === "won" || p === "lost");
+  if (p === "title") launchBtn.textContent = "▸ INSERT COIN";
+  else if (p === "playing") launchBtn.textContent = "▸ RESTART";
+  else launchBtn.textContent = "▸ NEXT TURN";
+}
+
+function start() {
+  const now = performance.now();
+  game = {
+    shipX: STAGE_W / 2,
+    bullets: [],
+    invaders: [],
+    fx: [],
+    score: 0,
+    keys: {},
+    lastFire: 0,
+    nextSpawn: now + 400,
+    startT: now,
+    question: pickQuestion(),
+    spawned: 0,
+    nextId: 1,
+  };
+  setPhase("playing");
+  hudKillsEl.textContent = "KILLS 00 / " + KILL_GOAL;
+  hudTimeEl.textContent = "TIME 30.0s";
+  progFillEl.style.width = "0%";
+  if (rafId) cancelAnimationFrame(rafId);
+  let last = now;
+  const loop = (t) => {
+    const dt = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    update(t, dt);
+    draw(t);
+    if (phase === "playing") rafId = requestAnimationFrame(loop);
+    else rafId = null;
+  };
+  rafId = requestAnimationFrame(loop);
+}
+
+function update(now, dt) {
+  const elapsed = now - game.startT;
+  const remaining = Math.max(0, ROUND_MS - elapsed);
+
+  // Ship
+  const k = game.keys;
+  if (k.arrowleft || k.a) game.shipX -= SHIP_SPEED * dt;
+  if (k.arrowright || k.d) game.shipX += SHIP_SPEED * dt;
+  if (game.shipX < SHIP_HALF_W) game.shipX = SHIP_HALF_W;
+  else if (game.shipX > STAGE_W - SHIP_HALF_W) game.shipX = STAGE_W - SHIP_HALF_W;
+
+  // Fire
+  if (k.fire && now - game.lastFire > FIRE_COOLDOWN && game.bullets.length < MAX_BULLETS) {
+    game.bullets.push({ id: game.nextId++, x: game.shipX, y: SHIP_Y - 22 });
+    game.lastFire = now;
+  }
+
+  // Bullets
+  for (let i = 0; i < game.bullets.length; i++) game.bullets[i].y -= BULLET_SPEED * dt;
+  game.bullets = game.bullets.filter(function (b) { return b.y > -16; });
+
+  // Spawn invaders
+  while (now > game.nextSpawn) {
+    const ramp = Math.min(1, elapsed / ROUND_MS);
+    const speed = 70 + ramp * 90 + Math.random() * 50;
+    const x = 50 + Math.random() * (STAGE_W - 100);
+    const vx = (Math.random() - 0.5) * 90;
+    const hue = HUES[Math.floor(Math.random() * HUES.length)];
+    game.invaders.push({ id: game.nextId++, x: x, y: -20, vx: vx, vy: speed, hue: hue });
+    const gap = 1500 - ramp * 700 + Math.random() * 280;
+    game.nextSpawn = now + gap;
+    game.spawned++;
+  }
+
+  // Invader motion
+  for (let i = 0; i < game.invaders.length; i++) {
+    const inv = game.invaders[i];
+    inv.x += inv.vx * dt;
+    if (inv.x < INVADER_HALF) { inv.x = INVADER_HALF; inv.vx = -inv.vx; }
+    else if (inv.x > STAGE_W - INVADER_HALF) { inv.x = STAGE_W - INVADER_HALF; inv.vx = -inv.vx; }
+    inv.y += inv.vy * dt;
+  }
+  game.invaders = game.invaders.filter(function (inv) { return inv.y < STAGE_H + 40; });
+
+  // Collisions
+  let kills = 0;
+  const killedB = new Set(), killedI = new Set();
+  for (let bi = 0; bi < game.bullets.length; bi++) {
+    const b = game.bullets[bi];
+    if (killedB.has(b.id)) continue;
+    for (let ii = 0; ii < game.invaders.length; ii++) {
+      const inv = game.invaders[ii];
+      if (killedI.has(inv.id)) continue;
+      if (Math.abs(b.x - inv.x) < HIT_RX && Math.abs(b.y - inv.y) < HIT_RY) {
+        killedB.add(b.id); killedI.add(inv.id);
+        game.fx.push({ id: game.nextId++, kind: "boom", x: inv.x, y: inv.y, vx: 0, vy: 0, hue: inv.hue, born: now });
+        for (let s = 0; s < 5; s++) {
+          const ang = Math.random() * Math.PI * 2;
+          const sp = 80 + Math.random() * 90;
+          game.fx.push({
+            id: game.nextId++, kind: "spark",
+            x: inv.x, y: inv.y,
+            vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+            hue: inv.hue, born: now,
+          });
+        }
+        kills++;
+        break;
+      }
+    }
+  }
+  if (kills > 0) {
+    game.bullets = game.bullets.filter(function (b) { return !killedB.has(b.id); });
+    game.invaders = game.invaders.filter(function (inv) { return !killedI.has(inv.id); });
+    game.score += kills;
+    hudKillsEl.textContent = "KILLS " + String(game.score).padStart(2, "0") + " / " + KILL_GOAL;
+    progFillEl.style.width = Math.min(100, (game.score / KILL_GOAL) * 100) + "%";
+  }
+
+  // FX
+  for (let i = 0; i < game.fx.length; i++) {
+    const f = game.fx[i];
+    if (f.kind === "spark") {
+      f.x += f.vx * dt; f.y += f.vy * dt;
+      f.vx *= 0.92; f.vy *= 0.92;
+    }
+  }
+  game.fx = game.fx.filter(function (f) { return now - f.born < (f.kind === "boom" ? 500 : 600); });
+
+  // HUD
+  hudTimeEl.textContent = "TIME " + (remaining / 1000).toFixed(1) + "s";
+
+  // End
+  if (game.score >= KILL_GOAL) endGame("won");
+  else if (remaining <= 0) endGame("lost");
+}
+
+function draw(now) {
+  ctx.clearRect(0, 0, STAGE_W, STAGE_H);
+  if (phase !== "playing") return;
+  drawShip(game.shipX, SHIP_Y);
+  for (let i = 0; i < game.bullets.length; i++) {
+    drawBullet(game.bullets[i].x, game.bullets[i].y);
+  }
+  for (let i = 0; i < game.invaders.length; i++) {
+    const inv = game.invaders[i];
+    drawInvader(inv.x, inv.y, inv.hue);
+  }
+  for (let i = 0; i < game.fx.length; i++) {
+    const f = game.fx[i];
+    if (f.kind === "boom") drawExplosion(f.x, f.y, (now - f.born) / 500);
+    else drawSpark(f.x, f.y, f.hue, (now - f.born) / 600);
+  }
+}
+
+function endGame(p) {
+  setPhase(p);
+  // Force-clear canvas now since the loop won't run anymore
+  ctx.clearRect(0, 0, STAGE_W, STAGE_H);
+
+  endBannerEl.className = "banner-big " + p;
+  endStatEl.textContent = game.score + " KILLS · TARGET " + KILL_GOAL + " " + (p === "won" ? "CLEARED" : "MISSED");
+  endBannerEl.textContent = p === "won" ? "★ VICTORY ★" : "MISSION FAILED";
+  questionTextEl.textContent = game.question;
+
+  // Cleanup any decorations from prior end
+  endOverlayEl.querySelectorAll(".confetti, .smoke").forEach(function (el) { el.remove(); });
+
+  if (p === "won") {
+    endOverlayEl.className = "end-overlay win";
+    for (let i = 0; i < 30; i++) {
+      const el = document.createElement("span");
+      el.className = "confetti";
+      el.style.left = (Math.random() * 100) + "%";
+      el.style.background = HUES[i % HUES.length];
+      el.style.animationDelay = (Math.random() * 0.6) + "s";
+      endOverlayEl.appendChild(el);
+    }
+  } else {
+    endOverlayEl.className = "end-overlay lose";
+    for (let i = 0; i < 6; i++) {
+      const el = document.createElement("span");
+      el.className = "smoke";
+      el.style.left = (60 + i * 110) / STAGE_W * 100 + "%";
+      el.style.animationDelay = (i * 0.1) + "s";
+      endOverlayEl.appendChild(el);
+    }
+    stageEl.classList.add("shake");
+    setTimeout(function () { stageEl.classList.remove("shake"); }, 400);
+  }
+}
+
+// ===== Input =====
+window.addEventListener("keydown", function (e) {
+  if (phase !== "playing") return;
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " ", "Spacebar"].indexOf(e.key) !== -1) {
+    e.preventDefault();
+  }
+  game.keys[e.key.toLowerCase()] = true;
+  if (e.key === " " || e.key === "Spacebar") game.keys.fire = true;
+});
+window.addEventListener("keyup", function (e) {
+  if (!game) return;
+  game.keys[e.key.toLowerCase()] = false;
+  if (e.key === " " || e.key === "Spacebar") game.keys.fire = false;
+});
+
+// Touch + click pseudo-keys
+document.querySelectorAll(".touch-btn").forEach(function (btn) {
+  const key = btn.dataset.key;
+  const setOn = function (e) { e.preventDefault(); if (game) game.keys[key] = true; };
+  const setOff = function (e) { e.preventDefault(); if (game) game.keys[key] = false; };
+  btn.addEventListener("touchstart", setOn, { passive: false });
+  btn.addEventListener("touchend", setOff, { passive: false });
+  btn.addEventListener("touchcancel", setOff, { passive: false });
+  btn.addEventListener("mousedown", setOn);
+  btn.addEventListener("mouseup", setOff);
+  btn.addEventListener("mouseleave", setOff);
+});
+
+// Launch button — blur + intercept SPACE/ENTER so it doesn't auto-restart
+launchBtn.addEventListener("click", function (e) { e.currentTarget.blur(); start(); });
+launchBtn.addEventListener("keydown", function (e) {
+  if (e.key === " " || e.key === "Enter" || e.key === "Spacebar") e.preventDefault();
+});
+</script>
+</body>
+</html>
